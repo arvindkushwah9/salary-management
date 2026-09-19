@@ -6,6 +6,7 @@ class Employee < ApplicationRecord
 
   has_many :payslips,
            dependent: :restrict_with_error
+  
 
   STATUSES = %w[active terminated on_leave].freeze
 

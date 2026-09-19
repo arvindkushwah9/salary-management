@@ -20,6 +20,23 @@ Rails.application.routes.draw do
 
       get "dashboard", to: "dashboard#show"
       get "salary_reports", to: "salary_reports#index"
+
+      resources :payroll_runs do
+        member do
+          post :process
+          post :approve
+        end
+
+        resources :payslips, only: %i[index show]
+      end
+
+      resources :employees do
+        resources :payslips, only: :index
+      end
+
+      resources :payslips, only: [] do
+        resources :payslip_items, only: %i[index create]
+      end
     end
   end
 end

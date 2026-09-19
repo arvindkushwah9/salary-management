@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_19_121252) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_19_130212) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -44,6 +44,50 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_19_121252) do
     t.index ["status"], name: "index_employees_on_status"
   end
 
+  create_table "payroll_runs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "approved_at"
+    t.uuid "approved_by"
+    t.datetime "created_at", null: false
+    t.string "payroll_period", limit: 7, null: false
+    t.string "status", default: "draft", null: false
+    t.decimal "total_deductions", precision: 14, scale: 2, default: "0.0", null: false
+    t.decimal "total_gross", precision: 14, scale: 2, default: "0.0", null: false
+    t.decimal "total_net", precision: 14, scale: 2, default: "0.0", null: false
+    t.datetime "updated_at", null: false
+    t.index ["payroll_period"], name: "index_payroll_runs_on_payroll_period", unique: true
+    t.index ["status"], name: "index_payroll_runs_on_status"
+  end
+
+  create_table "payslip_items", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.decimal "amount", precision: 12, scale: 2, null: false
+    t.string "code", limit: 30, null: false
+    t.datetime "created_at", null: false
+    t.string "description", limit: 100
+    t.string "item_type", limit: 20, null: false
+    t.uuid "payslip_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["payslip_id", "code"], name: "index_payslip_items_on_payslip_id_and_code"
+    t.index ["payslip_id", "item_type"], name: "index_payslip_items_on_payslip_id_and_item_type"
+    t.index ["payslip_id"], name: "index_payslip_items_on_payslip_id"
+  end
+
+  create_table "payslips", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.uuid "employee_id", null: false
+    t.decimal "gross_earnings", precision: 12, scale: 2, null: false
+    t.decimal "net_pay", precision: 12, scale: 2, null: false
+    t.decimal "paid_days", precision: 4, scale: 1, null: false
+    t.string "payment_status", default: "pending", null: false
+    t.uuid "payroll_run_id", null: false
+    t.text "payslip_pdf_url"
+    t.decimal "total_deductions", precision: 12, scale: 2, null: false
+    t.datetime "updated_at", null: false
+    t.integer "working_days", null: false
+    t.index ["employee_id"], name: "index_payslips_on_employee_id"
+    t.index ["payroll_run_id", "employee_id"], name: "index_payslips_on_payroll_run_id_and_employee_id", unique: true
+    t.index ["payroll_run_id"], name: "index_payslips_on_payroll_run_id"
+  end
+
   create_table "salary_structures", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.decimal "base_salary", precision: 12, scale: 2, null: false
     t.decimal "conveyance_allowance", precision: 12, scale: 2, default: "0.0", null: false
@@ -75,5 +119,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_19_121252) do
   end
 
   add_foreign_key "employees", "departments"
+  add_foreign_key "payslip_items", "payslips"
+  add_foreign_key "payslips", "employees"
+  add_foreign_key "payslips", "payroll_runs"
   add_foreign_key "salary_structures", "employees"
 end
