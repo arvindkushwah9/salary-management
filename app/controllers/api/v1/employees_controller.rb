@@ -6,7 +6,7 @@ module Api
           .search(params[:search])
           .by_country(params[:country])
           .by_department(params[:department])
-          .by_status(params[:employment_status])
+          .by_status(params[:status])
           .order(:last_name, :first_name)
 
         pagy, records = pagy(employees)
@@ -58,14 +58,15 @@ module Api
 
       def employee_params
         params.require(:employee).permit(
-          :employee_number,
+          :employee_code,
           :first_name,
           :last_name,
           :email,
+          :department_id,
+          :designation,
           :country,
-          :department,
-          :job_title,
-          :employment_status
+          :status,
+          :joined_date
         )
       end
 

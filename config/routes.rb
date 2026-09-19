@@ -15,7 +15,7 @@ Rails.application.routes.draw do
       post "auth/login", to: "auth#login"
 
       resources :employees do
-        resources :salary_records, only: %i[index create show update]
+        resources :salary_structures, only: %i[index create show update]
       end
 
       get "dashboard", to: "dashboard#show"

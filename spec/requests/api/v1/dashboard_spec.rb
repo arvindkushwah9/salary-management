@@ -1,7 +1,6 @@
 require "swagger_helper"
 
 RSpec.describe "Dashboard API", type: :request do
-
   let(:user) { create(:user) }
   let(:token) { JsonWebToken.encode(user_id: user.id) }
   let(:Authorization) { "Bearer #{token}" }
@@ -11,12 +10,13 @@ RSpec.describe "Dashboard API", type: :request do
       tags "Dashboard"
       security [bearerAuth: []]
       produces "application/json"
-        response "200", "dashboard summary returned" do
+
+      response "200", "dashboard summary returned" do
         let!(:us_employee) do
           create(
             :employee,
             country: "US",
-            employment_status: "active"
+            status: "active"
           )
         end
 
@@ -24,45 +24,45 @@ RSpec.describe "Dashboard API", type: :request do
           create(
             :employee,
             country: "UK",
-            employment_status: "active"
+            status: "active"
           )
         end
 
-        let!(:inactive_employee) do
+        let!(:terminated_employee) do
           create(
             :employee,
             country: "US",
-            employment_status: "inactive"
+            status: "terminated"
           )
         end
 
         let!(:us_salary) do
           create(
-            :salary_record,
+            :salary_structure,
             employee: us_employee,
-            amount: 100_000,
+            base_salary: 100_000,
             currency: "USD",
-            effective_date: Date.new(2026, 1, 1)
+            effective_from: Date.new(2026, 1, 1)
           )
         end
 
         let!(:uk_salary) do
           create(
-            :salary_record,
+            :salary_structure,
             employee: uk_employee,
-            amount: 80_000,
+            base_salary: 80_000,
             currency: "GBP",
-            effective_date: Date.new(2026, 1, 1)
+            effective_from: Date.new(2026, 1, 1)
           )
         end
 
-        let!(:us_second_salary) do
+        let!(:terminated_salary) do
           create(
-            :salary_record,
-            employee: inactive_employee,
-            amount: 90_000,
+            :salary_structure,
+            employee: terminated_employee,
+            base_salary: 90_000,
             currency: "USD",
-            effective_date: Date.new(2026, 1, 1)
+            effective_from: Date.new(2026, 1, 1)
           )
         end
 

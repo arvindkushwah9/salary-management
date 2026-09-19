@@ -133,7 +133,7 @@ paths:
         required: false
         schema:
           type: string
-      - name: employment_status
+      - name: status
         in: query
         required: false
         schema:
@@ -164,7 +164,7 @@ paths:
                         id:
                           type: string
                           format: uuid
-                        employee_number:
+                        employee_code:
                           type: string
                         first_name:
                           type: string
@@ -177,12 +177,31 @@ paths:
                         country:
                           type: string
                         department:
-                          type: string
+                          type: object
                           nullable: true
-                        job_title:
+                          properties:
+                            id:
+                              type: string
+                              format: uuid
+                            code:
+                              type: string
+                            name:
+                              type: string
+                            created_at:
+                              type: string
+                              format: date-time
+                            updated_at:
+                              type: string
+                              format: date-time
+                          required:
+                          - id
+                          - code
+                          - name
+                        designation:
                           type: string
-                          nullable: true
-                        employment_status:
+                        status:
+                          type: string
+                        joined_date:
                           type: string
                   meta:
                     type: object
@@ -216,14 +235,17 @@ paths:
             schema:
               type: object
               required:
-              - employee_number
+              - employee_code
               - first_name
               - last_name
               - email
+              - department_id
+              - designation
               - country
-              - employment_status
+              - status
+              - joined_date
               properties:
-                employee_number:
+                employee_code:
                   type: string
                 first_name:
                   type: string
@@ -231,13 +253,16 @@ paths:
                   type: string
                 email:
                   type: string
+                department_id:
+                  type: string
+                  format: uuid
+                designation:
+                  type: string
                 country:
                   type: string
-                department:
+                status:
                   type: string
-                job_title:
-                  type: string
-                employment_status:
+                joined_date:
                   type: string
         required: true
   "/api/v1/employees/{id}":
@@ -268,7 +293,7 @@ paths:
                       id:
                         type: string
                         format: uuid
-                      employee_number:
+                      employee_code:
                         type: string
                       first_name:
                         type: string
@@ -281,12 +306,31 @@ paths:
                       country:
                         type: string
                       department:
-                        type: string
+                        type: object
                         nullable: true
-                      job_title:
+                        properties:
+                          id:
+                            type: string
+                            format: uuid
+                          code:
+                            type: string
+                          name:
+                            type: string
+                          created_at:
+                            type: string
+                            format: date-time
+                          updated_at:
+                            type: string
+                            format: date-time
+                        required:
+                        - id
+                        - code
+                        - name
+                      designation:
                         type: string
-                        nullable: true
-                      employment_status:
+                      status:
+                        type: string
+                      joined_date:
                         type: string
                 required:
                 - data
@@ -318,16 +362,19 @@ paths:
                   type: string
                 email:
                   type: string
+                department_id:
+                  type: string
+                  format: uuid
+                designation:
+                  type: string
                 country:
                   type: string
-                department:
+                status:
                   type: string
-                job_title:
-                  type: string
-                employment_status:
+                joined_date:
                   type: string
         required: true
-  "/api/v1/employees/{employee_id}/salary_records":
+  "/api/v1/employees/{employee_id}/salary_structures":
     parameters:
     - name: employee_id
       in: path
@@ -336,14 +383,14 @@ paths:
       schema:
         type: string
     get:
-      summary: List salary records
+      summary: List Salary Structures
       tags:
-      - Salary Records
+      - Salary Structures
       security:
       - bearerAuth: []
       responses:
         '200':
-          description: salary records found
+          description: Salary Structures found
           content:
             application/json:
               schema:
@@ -360,19 +407,19 @@ paths:
                         employee_id:
                           type: string
                           format: uuid
-                        amount:
+                        base_salary:
                           type: number
                         currency:
                           type: string
-                        effective_date:
+                        effective_from:
                           type: string
                           format: date
                       required:
                       - id
                       - employee_id
-                      - amount
+                      - base_salary
                       - currency
-                      - effective_date
+                      - effective_from
                 required:
                 - data
         '404':
@@ -380,7 +427,7 @@ paths:
     post:
       summary: Create salary record
       tags:
-      - Salary Records
+      - Salary Structures
       security:
       - bearerAuth: []
       parameters: []
@@ -395,7 +442,7 @@ paths:
             schema:
               type: object
               properties:
-                amount:
+                base_salary:
                   type: number
                   format: double
                   minimum: 0
@@ -403,11 +450,11 @@ paths:
                   type: string
                   minLength: 3
                   maxLength: 3
-                effective_date:
+                effective_from:
                   type: string
                   format: date
         required: true
-  "/api/v1/employees/{employee_id}/salary_records/{id}":
+  "/api/v1/employees/{employee_id}/salary_structures/{id}":
     parameters:
     - name: employee_id
       in: path
@@ -424,7 +471,7 @@ paths:
     get:
       summary: Show salary record
       tags:
-      - Salary Records
+      - Salary Structures
       security:
       - bearerAuth: []
       responses:
@@ -444,19 +491,19 @@ paths:
                       employee_id:
                         type: string
                         format: uuid
-                      amount:
+                      base_salary:
                         type: number
                       currency:
                         type: string
-                      effective_date:
+                      effective_from:
                         type: string
                         format: date
                     required:
                     - id
                     - employee_id
-                    - amount
+                    - base_salary
                     - currency
-                    - effective_date
+                    - effective_from
                 required:
                 - data
         '404':
@@ -464,7 +511,7 @@ paths:
     patch:
       summary: Update salary record
       tags:
-      - Salary Records
+      - Salary Structures
       security:
       - bearerAuth: []
       parameters: []
@@ -479,7 +526,7 @@ paths:
             schema:
               type: object
               properties:
-                amount:
+                base_salary:
                   type: number
                   format: double
                   minimum: 0
@@ -487,7 +534,7 @@ paths:
                   type: string
                   minLength: 3
                   maxLength: 3
-                effective_date:
+                effective_from:
                   type: string
                   format: date
         required: true
@@ -495,7 +542,7 @@ servers:
 - url: http://{defaultHost}
   variables:
     defaultHost:
-      default: localhost:3000
+      default: localhost:3001
 components:
   securitySchemes:
     bearerAuth:

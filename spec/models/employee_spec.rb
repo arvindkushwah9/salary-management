@@ -4,18 +4,18 @@ RSpec.describe Employee, type: :model do
   subject(:employee) { build(:employee) }
 
   describe "associations" do
-    it { is_expected.to have_many(:salary_records).dependent(:restrict_with_error) }
+    it { is_expected.to have_many(:salary_structures).dependent(:restrict_with_error) }
   end
 
   describe "validations" do
-    it { is_expected.to validate_presence_of(:employee_number) }
-    it { is_expected.to validate_uniqueness_of(:employee_number) }
+    it { is_expected.to validate_presence_of(:employee_code) }
+    it { is_expected.to validate_uniqueness_of(:employee_code) }
 
     it { is_expected.to validate_presence_of(:first_name) }
     it { is_expected.to validate_presence_of(:last_name) }
     it { is_expected.to validate_presence_of(:email) }
     it { is_expected.to validate_presence_of(:country) }
-    it { is_expected.to validate_presence_of(:employment_status) }
+    it { is_expected.to validate_presence_of(:status) }
 
     it { is_expected.to validate_uniqueness_of(:email) }
 
@@ -35,8 +35,8 @@ RSpec.describe Employee, type: :model do
   describe "scopes" do
     describe ".active" do
       it "returns active employees" do
-        active_employee = create(:employee, employment_status: "active")
-        create(:employee, employment_status: "inactive")
+        active_employee = create(:employee, status: "active")
+        create(:employee, status: "terminated")
 
         expect(described_class.active).to contain_exactly(active_employee)
       end
@@ -44,10 +44,10 @@ RSpec.describe Employee, type: :model do
 
     describe ".inactive" do
       it "returns inactive employees" do
-        inactive_employee = create(:employee, employment_status: "inactive")
-        create(:employee, employment_status: "active")
+        terminated_employee = create(:employee, status: "terminated")
+        create(:employee, status: "active")
 
-        expect(described_class.inactive).to contain_exactly(inactive_employee)
+        expect(described_class.terminated).to contain_exactly(terminated_employee)
       end
     end
 
@@ -70,10 +70,20 @@ RSpec.describe Employee, type: :model do
 
     describe ".by_department" do
       it "filters employees by department" do
-        engineer = create(:employee, department: "Engineering")
-        create(:employee, department: "Finance")
+        engineering = create(:department, name: "Engineering")
+        sales = create(:department, name: "Sales")
 
-        expect(described_class.by_department("Engineering"))
+        engineer = create(
+          :employee,
+          department: engineering
+        )
+
+        create(
+          :employee,
+          department: sales
+        )
+
+        expect(Employee.by_department(engineering.id))
           .to contain_exactly(engineer)
       end
     end
@@ -82,7 +92,7 @@ RSpec.describe Employee, type: :model do
       it "searches by employee number" do
         employee = create(
           :employee,
-          employee_number: "EMP-12345"
+          employee_code: "EMP-12345"
         )
 
         expect(described_class.search("EMP-12345"))
@@ -139,17 +149,17 @@ RSpec.describe Employee, type: :model do
       employee = create(:employee)
 
       older = create(
-        :salary_record,
+        :salary_structure,
         employee: employee,
-        effective_date: 2.months.ago.to_date,
-        amount: 80_000
+        effective_from: 2.months.ago.to_date,
+        base_salary: 80_000
       )
 
       latest = create(
-        :salary_record,
+        :salary_structure,
         employee: employee,
-        effective_date: 1.month.ago.to_date,
-        amount: 90_000
+        effective_from: 1.month.ago.to_date,
+        base_salary: 90_000
       )
 
       expect(employee.current_salary).to eq(latest)
@@ -160,9 +170,9 @@ RSpec.describe Employee, type: :model do
       employee = create(:employee)
 
       future_salary = create(
-        :salary_record,
+        :salary_structure,
         employee: employee,
-        effective_date: 1.month.from_now.to_date
+        effective_from: 1.month.from_now.to_date
       )
 
       expect(employee.current_salary).to be_nil

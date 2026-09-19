@@ -1,7 +1,7 @@
 class DashboardService
   def initialize
     @employees = Employee.all
-    @salary_records = SalaryRecord.all
+    @salary_structures = SalaryStructure.all
   end
 
   def call
@@ -34,10 +34,10 @@ class DashboardService
 
   def salary_summary
     {
-      employees_with_salary: @salary_records
+      employees_with_salary: @salary_structures
         .distinct
         .count(:employee_id),
-      currencies: @salary_records
+      currencies: @salary_structures
         .distinct
         .order(:currency)
         .pluck(:currency),
@@ -46,13 +46,13 @@ class DashboardService
   end
 
   def salary_statistics_by_currency
-    @salary_records
+    @salary_structures
       .group(:currency)
       .pluck(
         :currency,
-        Arel.sql("MIN(amount)"),
-        Arel.sql("MAX(amount)"),
-        Arel.sql("AVG(amount)")
+        Arel.sql("MIN(base_salary)"),
+        Arel.sql("MAX(base_salary)"),
+        Arel.sql("AVG(base_salary)")
       )
       .sort_by(&:first)
       .map do |currency, minimum, maximum, average|

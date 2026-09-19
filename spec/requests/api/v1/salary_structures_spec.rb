@@ -1,42 +1,42 @@
 require "swagger_helper"
 
-RSpec.describe "Salary Records API", type: :request do
+RSpec.describe "Salary Structures API", type: :request do
   let(:user) { create(:user) }
   let(:token) { JsonWebToken.encode(user_id: user.id) }
   let(:Authorization) { "Bearer #{token}" }
-  path "/api/v1/employees/{employee_id}/salary_records" do
+  path "/api/v1/employees/{employee_id}/salary_structures" do
     parameter name: :employee_id,
               in: :path,
               type: :string,
               format: :uuid,
               required: true
 
-    get "List salary records" do
-      tags "Salary Records"
+    get "List Salary Structures" do
+      tags "Salary Structures"
       security [bearerAuth: []]
       produces "application/json"
 
-      response "200", "salary records found" do
+      response "200", "Salary Structures found" do
         let!(:employee) { create(:employee) }
         let(:employee_id) { employee.id }
 
         let!(:older_salary) do
           create(
-            :salary_record,
+            :salary_structure,
             employee: employee,
-            amount: 90_000,
+            base_salary: 90_000,
             currency: "USD",
-            effective_date: Date.new(2025, 1, 1)
+            effective_from: Date.new(2025, 1, 1)
           )
         end
 
         let!(:current_salary) do
           create(
-            :salary_record,
+            :salary_structure,
             employee: employee,
-            amount: 110_000,
+            base_salary: 110_000,
             currency: "USD",
-            effective_date: Date.new(2026, 1, 1)
+            effective_from: Date.new(2026, 1, 1)
           )
         end
 
@@ -49,16 +49,16 @@ RSpec.describe "Salary Records API", type: :request do
                 properties: {
                   id: { type: :string, format: :uuid },
                   employee_id: { type: :string, format: :uuid },
-                  amount: { type: :number },
+                  base_salary: { type: :number },
                   currency: { type: :string },
-                  effective_date: { type: :string, format: :date }
+                  effective_from: { type: :string, format: :date }
                 },
                 required: %w[
                   id
                   employee_id
-                  amount
+                  base_salary
                   currency
-                  effective_date
+                  effective_from
                 ]
               }
             }
@@ -69,8 +69,8 @@ RSpec.describe "Salary Records API", type: :request do
           body = JSON.parse(response.body)
 
           expect(body["data"].length).to eq(2)
-          expect(body["data"].first["effective_date"]).to eq("2026-01-01")
-          expect(body["data"].last["effective_date"]).to eq("2025-01-01")
+          expect(body["data"].first["effective_from"]).to eq("2026-01-01")
+          expect(body["data"].last["effective_from"]).to eq("2025-01-01")
         end
       end
 
@@ -82,18 +82,18 @@ RSpec.describe "Salary Records API", type: :request do
     end
 
     post "Create salary record" do
-      tags "Salary Records"
+      tags "Salary Structures"
       security [bearerAuth: []]
       consumes "application/json"
       produces "application/json"
 
-      parameter name: :salary_record,
+      parameter name: :salary_structure,
           in: :body,
           required: true,
           schema: {
             type: :object,
             properties: {
-              amount: {
+              base_salary: {
                 type: :number,
                 format: :double,
                 minimum: 0
@@ -103,7 +103,7 @@ RSpec.describe "Salary Records API", type: :request do
                 minLength: 3,
                 maxLength: 3
               },
-              effective_date: {
+              effective_from: {
                 type: :string,
                 format: :date
               }
@@ -114,12 +114,12 @@ RSpec.describe "Salary Records API", type: :request do
         let!(:employee) { create(:employee) }
         let(:employee_id) { employee.id }
 
-        let(:salary_record) do
+        let(:salary_structure) do
           {
-            salary_record: {
-              amount: 125_000,
+            salary_structure: {
+              base_salary: 125_000,
               currency: "USD",
-              effective_date: "2026-09-01"
+              effective_from: "2026-09-01"
             }
           }
         end
@@ -131,12 +131,12 @@ RSpec.describe "Salary Records API", type: :request do
         let!(:employee) { create(:employee) }
         let(:employee_id) { employee.id }
 
-        let(:salary_record) do
+        let(:salary_structure) do
           {
-            salary_record: {
-              amount: -100,
+            salary_structure: {
+              base_salary: -100,
               currency: "US",
-              effective_date: ""
+              effective_from: ""
             }
           }
         end
@@ -146,7 +146,7 @@ RSpec.describe "Salary Records API", type: :request do
     end
   end
 
-  path "/api/v1/employees/{employee_id}/salary_records/{id}" do
+  path "/api/v1/employees/{employee_id}/salary_structures/{id}" do
     parameter name: :employee_id,
               in: :path,
               type: :string,
@@ -160,25 +160,25 @@ RSpec.describe "Salary Records API", type: :request do
               required: true
 
     get "Show salary record" do
-      tags "Salary Records"
+      tags "Salary Structures"
       security [bearerAuth: []]
       produces "application/json"
 
       response "200", "salary record found" do
         let!(:employee) { create(:employee) }
 
-        let!(:salary_record) do
+        let!(:salary_structure) do
           create(
-            :salary_record,
+            :salary_structure,
             employee: employee,
-            amount: 120_000,
+            base_salary: 120_000,
             currency: "USD",
-            effective_date: Date.new(2026, 1, 1)
+            effective_from: Date.new(2026, 1, 1)
           )
         end
 
         let(:employee_id) { employee.id }
-        let(:id) { salary_record.id }
+        let(:id) { salary_structure.id }
 
         schema type: :object,
           properties: {
@@ -187,16 +187,16 @@ RSpec.describe "Salary Records API", type: :request do
               properties: {
                 id: { type: :string, format: :uuid },
                 employee_id: { type: :string, format: :uuid },
-                amount: { type: :number },
+                base_salary: { type: :number },
                 currency: { type: :string },
-                effective_date: { type: :string, format: :date }
+                effective_from: { type: :string, format: :date }
               },
               required: %w[
                 id
                 employee_id
-                amount
+                base_salary
                 currency
-                effective_date
+                effective_from
               ]
             }
           },
@@ -217,30 +217,30 @@ RSpec.describe "Salary Records API", type: :request do
         let!(:employee) { create(:employee) }
         let!(:other_employee) { create(:employee) }
 
-        let!(:salary_record) do
-          create(:salary_record, employee: other_employee)
+        let!(:salary_structure) do
+          create(:salary_structure, employee: other_employee)
         end
 
         let(:employee_id) { employee.id }
-        let(:id) { salary_record.id }
+        let(:id) { salary_structure.id }
 
         run_test!
       end
     end
 
     patch "Update salary record" do
-      tags "Salary Records"
+      tags "Salary Structures"
       security [bearerAuth: []]
       consumes "application/json"
       produces "application/json"
 
-      parameter name: :salary_record,
+      parameter name: :salary_structure,
                 in: :body,
                 required: true,
                 schema: {
                   type: :object,
                   properties: {
-                    amount: {
+                    base_salary: {
                       type: :number,
                       format: :double,
                       minimum: 0
@@ -250,7 +250,7 @@ RSpec.describe "Salary Records API", type: :request do
                       minLength: 3,
                       maxLength: 3
                     },
-                    effective_date: {
+                    effective_from: {
                       type: :string,
                       format: :date
                     }
@@ -260,23 +260,23 @@ RSpec.describe "Salary Records API", type: :request do
       response "200", "salary record updated" do
           let!(:employee) { create(:employee) }
 
-          let!(:salary_record_record) do
+          let!(:salary_structure_record) do
             create(
-              :salary_record,
+              :salary_structure,
               employee: employee,
-              amount: 100_000,
+              base_salary: 100_000,
               currency: "USD",
-              effective_date: Date.new(2026, 1, 1)
+              effective_from: Date.new(2026, 1, 1)
             )
           end
 
           let(:employee_id) { employee.id }
-          let(:id) { salary_record_record.id }
+          let(:id) { salary_structure_record.id }
 
-          let(:salary_record) do
+          let(:salary_structure) do
             {
-              salary_record: {
-                amount: 110_000,
+              salary_structure: {
+                base_salary: 110_000,
                 currency: "USD"
               }
             }
@@ -288,23 +288,23 @@ RSpec.describe "Salary Records API", type: :request do
       response "422", "invalid salary record update" do
         let!(:employee) { create(:employee) }
 
-        let!(:salary_record_record) do
+        let!(:salary_structure_record) do
           create(
-            :salary_record,
+            :salary_structure,
             employee: employee,
-            amount: 100_000,
+            base_salary: 100_000,
             currency: "USD",
-            effective_date: Date.new(2026, 1, 1)
+            effective_from: Date.new(2026, 1, 1)
           )
         end
 
         let(:employee_id) { employee.id }
-        let(:id) { salary_record_record.id }
+        let(:id) { salary_structure_record.id }
 
-        let(:salary_record) do
+        let(:salary_structure) do
           {
-            salary_record: {
-              amount: -500
+            salary_structure: {
+              base_salary: -500
             }
           }
         end

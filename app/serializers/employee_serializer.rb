@@ -6,7 +6,7 @@ class EmployeeSerializer
   def as_json
     {
       id: @employee.id,
-      employee_number: @employee.employee_number,
+      employee_code: @employee.employee_code,
       first_name: @employee.first_name,
       last_name: @employee.last_name,
       full_name: @employee.full_name,
@@ -14,7 +14,7 @@ class EmployeeSerializer
       country: @employee.country,
       department: @employee.department,
       job_title: @employee.job_title,
-      employment_status: @employee.employment_status
+      status: @employee.status
     }
   end
 end
