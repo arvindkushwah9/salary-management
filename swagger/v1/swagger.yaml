@@ -4,6 +4,84 @@ info:
   title: API V1
   version: v1
 paths:
+  "/api/v1/dashboard":
+    get:
+      summary: Get dashboard summary
+      tags:
+      - Dashboard
+      responses:
+        '200':
+          description: dashboard summary returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      employees:
+                        type: object
+                        properties:
+                          total:
+                            type: integer
+                          active:
+                            type: integer
+                          inactive:
+                            type: integer
+                        required:
+                        - total
+                        - active
+                        - inactive
+                      countries:
+                        type: object
+                        properties:
+                          count:
+                            type: integer
+                          employee_count_by_country:
+                            type: object
+                            additionalProperties:
+                              type: integer
+                        required:
+                        - count
+                        - employee_count_by_country
+                      salary:
+                        type: object
+                        properties:
+                          employees_with_salary:
+                            type: integer
+                          currencies:
+                            type: array
+                            items:
+                              type: string
+                          statistics_by_currency:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                currency:
+                                  type: string
+                                minimum:
+                                  type: number
+                                maximum:
+                                  type: number
+                                average:
+                                  type: number
+                              required:
+                              - currency
+                              - minimum
+                              - maximum
+                              - average
+                        required:
+                        - employees_with_salary
+                        - currencies
+                        - statistics_by_currency
+                    required:
+                    - employees
+                    - countries
+                    - salary
+                required:
+                - data
   "/api/v1/employees":
     get:
       summary: List employees
@@ -212,6 +290,162 @@ paths:
                   type: string
                 employment_status:
                   type: string
+        required: true
+  "/api/v1/employees/{employee_id}/salary_records":
+    parameters:
+    - name: employee_id
+      in: path
+      format: uuid
+      required: true
+      schema:
+        type: string
+    get:
+      summary: List salary records
+      tags:
+      - Salary Records
+      responses:
+        '200':
+          description: salary records found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        employee_id:
+                          type: string
+                          format: uuid
+                        amount:
+                          type: number
+                        currency:
+                          type: string
+                        effective_date:
+                          type: string
+                          format: date
+                      required:
+                      - id
+                      - employee_id
+                      - amount
+                      - currency
+                      - effective_date
+                required:
+                - data
+        '404':
+          description: employee not found
+    post:
+      summary: Create salary record
+      tags:
+      - Salary Records
+      parameters: []
+      responses:
+        '201':
+          description: salary record created
+        '422':
+          description: invalid salary record
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: number
+                  format: double
+                  minimum: 0
+                currency:
+                  type: string
+                  minLength: 3
+                  maxLength: 3
+                effective_date:
+                  type: string
+                  format: date
+        required: true
+  "/api/v1/employees/{employee_id}/salary_records/{id}":
+    parameters:
+    - name: employee_id
+      in: path
+      format: uuid
+      required: true
+      schema:
+        type: string
+    - name: id
+      in: path
+      format: uuid
+      required: true
+      schema:
+        type: string
+    get:
+      summary: Show salary record
+      tags:
+      - Salary Records
+      responses:
+        '200':
+          description: salary record found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      employee_id:
+                        type: string
+                        format: uuid
+                      amount:
+                        type: number
+                      currency:
+                        type: string
+                      effective_date:
+                        type: string
+                        format: date
+                    required:
+                    - id
+                    - employee_id
+                    - amount
+                    - currency
+                    - effective_date
+                required:
+                - data
+        '404':
+          description: salary record belongs to another employee
+    patch:
+      summary: Update salary record
+      tags:
+      - Salary Records
+      parameters: []
+      responses:
+        '200':
+          description: salary record updated
+        '422':
+          description: invalid salary record update
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: number
+                  format: double
+                  minimum: 0
+                currency:
+                  type: string
+                  minLength: 3
+                  maxLength: 3
+                effective_date:
+                  type: string
+                  format: date
         required: true
 servers:
 - url: http://{defaultHost}

@@ -7,7 +7,8 @@ class SalaryRecord < ApplicationRecord
 
   validates :currency,
             presence: true,
-            length: { is: 3 }
+            length: { is: 3 },
+            format: { with: /\A[A-Z]{3}\z/ }
 
   validates :effective_date, presence: true
 
@@ -26,4 +27,12 @@ class SalaryRecord < ApplicationRecord
   scope :latest_first, -> {
     order(effective_date: :desc)
   }
+
+  before_validation :normalize_currency
+
+  private
+
+  def normalize_currency
+    self.currency = currency.to_s.upcase
+  end
 end
