@@ -50,6 +50,7 @@ group :development, :test do
   gem "rspec-rails"
   gem "factory_bot_rails"
   gem "faker"
+  gem "shoulda-matchers"
 
   gem "rswag-api"
   gem "rswag-ui"
@@ -59,3 +60,5 @@ end
 group :development do
   gem "rubocop-rails-omakase", require: false
 end
+
+gem "pagy", "~> 43.6"
