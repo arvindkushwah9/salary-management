@@ -10,15 +10,16 @@ module Api
           .by_department(params[:department])
           .then { |scope| filter_by_status(scope) }
           .order(:last_name, :first_name)
-          .page(params[:page])
-          .per(params[:per_page])
+
+        pagy, records = pagy(employees)
 
         render json: {
-          data: employees.map { |employee| employee_json(employee) },
+          data: records.map { |employee| EmployeeSerializer.new(employee).as_json },
           meta: {
-            page: employees.current_page,
-            per_page: employees.limit_value,
-            total: employees.total_count
+            page: pagy.page,
+            per_page: pagy.limit,
+            total: pagy.count,
+            pages: pagy.pages
           }
         }
       end
