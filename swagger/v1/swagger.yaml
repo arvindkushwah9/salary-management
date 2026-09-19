@@ -35,14 +35,11 @@ paths:
         required: false
         schema:
           type: integer
-          minimum: 1
       - name: per_page
         in: query
         required: false
         schema:
           type: integer
-          minimum: 1
-          maximum: 100
       responses:
         '200':
           description: employees found
@@ -69,7 +66,6 @@ paths:
                           type: string
                         email:
                           type: string
-                          format: email
                         country:
                           type: string
                         department:
@@ -94,6 +90,129 @@ paths:
                 required:
                 - data
                 - meta
+    post:
+      summary: Create employee
+      tags:
+      - Employees
+      parameters: []
+      responses:
+        '201':
+          description: employee created
+        '422':
+          description: invalid employee
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - employee_number
+              - first_name
+              - last_name
+              - email
+              - country
+              - employment_status
+              properties:
+                employee_number:
+                  type: string
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+                email:
+                  type: string
+                country:
+                  type: string
+                department:
+                  type: string
+                job_title:
+                  type: string
+                employment_status:
+                  type: string
+        required: true
+  "/api/v1/employees/{id}":
+    parameters:
+    - name: id
+      in: path
+      format: uuid
+      required: true
+      schema:
+        type: string
+    get:
+      summary: Show employee
+      tags:
+      - Employees
+      responses:
+        '200':
+          description: employee found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      employee_number:
+                        type: string
+                      first_name:
+                        type: string
+                      last_name:
+                        type: string
+                      full_name:
+                        type: string
+                      email:
+                        type: string
+                      country:
+                        type: string
+                      department:
+                        type: string
+                        nullable: true
+                      job_title:
+                        type: string
+                        nullable: true
+                      employment_status:
+                        type: string
+                required:
+                - data
+        '404':
+          description: employee not found
+    patch:
+      summary: Update employee
+      tags:
+      - Employees
+      parameters: []
+      responses:
+        '200':
+          description: employee updated
+        '422':
+          description: invalid employee update
+        '404':
+          description: employee not found
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+                email:
+                  type: string
+                country:
+                  type: string
+                department:
+                  type: string
+                job_title:
+                  type: string
+                employment_status:
+                  type: string
+        required: true
 servers:
 - url: http://{defaultHost}
   variables:

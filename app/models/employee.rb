@@ -20,6 +20,10 @@ class Employee < ApplicationRecord
     where(department: department) if department.present?
   }
 
+  scope :by_status, ->(status) {
+    where(employment_status: status) if status.present?
+  }
+
   scope :search, ->(term) {
     return all if term.blank?
 
