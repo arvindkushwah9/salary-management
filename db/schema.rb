@@ -34,10 +34,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_19_065057) do
   end
 
   create_table "salary_records", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.decimal "amount"
+    t.decimal "amount", precision: 15, scale: 2, null: false
     t.datetime "created_at", null: false
-    t.string "currency"
-    t.date "effective_date"
+    t.string "currency", limit: 3, null: false
+    t.date "effective_date", null: false
     t.uuid "employee_id", null: false
     t.datetime "updated_at", null: false
     t.index ["currency"], name: "index_salary_records_on_currency"

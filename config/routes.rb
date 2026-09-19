@@ -9,4 +9,15 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "posts#index"
+
+  namespace :api do
+    namespace :v1 do
+      resources :employees do
+        resources :salary_records, only: %i[index create show update]
+      end
+
+      get "dashboard", to: "dashboard#show"
+      get "salary_reports", to: "salary_reports#index"
+    end
+  end
 end

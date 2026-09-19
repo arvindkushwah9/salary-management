@@ -1,19 +1,21 @@
 class Employee < ApplicationRecord
   has_many :salary_records, dependent: :restrict_with_error
 
-  STATUSES = %w[active inactive].freeze
-
   validates :employee_number, presence: true, uniqueness: true
-  validates :first_name, :last_name, :email, :country, presence: true
-  validates :email, uniqueness: true,
-                    format: { with: URI::MailTo::EMAIL_REGEXP }
-  validates :employment_status, inclusion: { in: STATUSES }
+  validates :first_name, :last_name, :email, :country, :employment_status,
+            presence: true
+  validates :email,
+            uniqueness: true,
+            format: { with: URI::MailTo::EMAIL_REGEXP }
+  validates :employment_status, inclusion: { in: %w[active inactive] }
 
   scope :active, -> { where(employment_status: "active") }
   scope :inactive, -> { where(employment_status: "inactive") }
+
   scope :by_country, ->(country) {
     where(country: country) if country.present?
   }
+
   scope :by_department, ->(department) {
     where(department: department) if department.present?
   }
@@ -37,6 +39,9 @@ class Employee < ApplicationRecord
   end
 
   def current_salary
-    salary_records.current.first
+    salary_records
+      .where("effective_date <= ?", Date.current)
+      .order(effective_date: :desc)
+      .first
   end
 end

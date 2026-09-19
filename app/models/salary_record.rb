@@ -1,11 +1,13 @@
 class SalaryRecord < ApplicationRecord
   belongs_to :employee
 
-  validates :amount, presence: true,
-                    numericality: { greater_than_or_equal_to: 0 }
+  validates :amount,
+            presence: true,
+            numericality: { greater_than_or_equal_to: 0 }
 
-  validates :currency, presence: true,
-                       length: { is: 3 }
+  validates :currency,
+            presence: true,
+            length: { is: 3 }
 
   validates :effective_date, presence: true
 
