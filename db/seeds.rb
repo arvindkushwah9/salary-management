@@ -10,6 +10,24 @@
 # Run with:
 #   bin/rails db:seed
 
+
+departments = [
+  ["ENG", "Engineering"],
+  ["PROD", "Product"],
+  ["SALES", "Sales"],
+  ["MKT", "Marketing"],
+  ["FIN", "Finance"],
+  ["HR", "Human Resources"],
+  ["OPS", "Operations"]
+]
+
+departments.each do |code, name|
+  Department.find_or_create_by!(code: code) do |department|
+    department.name = name
+  end
+end
+
+
 User.find_or_create_by!(email: "hr@example.com") do |user|
   user.password = "Password123!"
   user.role = "hr_manager"
