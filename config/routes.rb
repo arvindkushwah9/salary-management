@@ -12,6 +12,8 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
+      post "auth/login", to: "auth#login"
+
       resources :employees do
         resources :salary_records, only: %i[index create show update]
       end

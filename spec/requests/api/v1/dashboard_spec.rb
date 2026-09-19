@@ -1,12 +1,17 @@
 require "swagger_helper"
 
 RSpec.describe "Dashboard API", type: :request do
+
+  let(:user) { create(:user) }
+  let(:token) { JsonWebToken.encode(user_id: user.id) }
+  let(:Authorization) { "Bearer #{token}" }
+
   path "/api/v1/dashboard" do
     get "Get dashboard summary" do
       tags "Dashboard"
+      security [bearerAuth: []]
       produces "application/json"
-
-      response "200", "dashboard summary returned" do
+        response "200", "dashboard summary returned" do
         let!(:us_employee) do
           create(
             :employee,

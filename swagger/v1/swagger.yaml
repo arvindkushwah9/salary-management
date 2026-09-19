@@ -4,11 +4,39 @@ info:
   title: API V1
   version: v1
 paths:
+  "/api/v1/auth/login":
+    post:
+      summary: Login
+      tags:
+      - Authentication
+      parameters: []
+      responses:
+        '200':
+          description: login successful
+        '401':
+          description: invalid credentials
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - email
+              - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+        required: true
   "/api/v1/dashboard":
     get:
       summary: Get dashboard summary
       tags:
       - Dashboard
+      security:
+      - bearerAuth: []
       responses:
         '200':
           description: dashboard summary returned
@@ -87,6 +115,8 @@ paths:
       summary: List employees
       tags:
       - Employees
+      security:
+      - bearerAuth: []
       parameters:
       - name: search
         in: query
@@ -172,6 +202,8 @@ paths:
       summary: Create employee
       tags:
       - Employees
+      security:
+      - bearerAuth: []
       parameters: []
       responses:
         '201':
@@ -220,6 +252,8 @@ paths:
       summary: Show employee
       tags:
       - Employees
+      security:
+      - bearerAuth: []
       responses:
         '200':
           description: employee found
@@ -262,6 +296,8 @@ paths:
       summary: Update employee
       tags:
       - Employees
+      security:
+      - bearerAuth: []
       parameters: []
       responses:
         '200':
@@ -303,6 +339,8 @@ paths:
       summary: List salary records
       tags:
       - Salary Records
+      security:
+      - bearerAuth: []
       responses:
         '200':
           description: salary records found
@@ -343,6 +381,8 @@ paths:
       summary: Create salary record
       tags:
       - Salary Records
+      security:
+      - bearerAuth: []
       parameters: []
       responses:
         '201':
@@ -385,6 +425,8 @@ paths:
       summary: Show salary record
       tags:
       - Salary Records
+      security:
+      - bearerAuth: []
       responses:
         '200':
           description: salary record found
@@ -423,6 +465,8 @@ paths:
       summary: Update salary record
       tags:
       - Salary Records
+      security:
+      - bearerAuth: []
       parameters: []
       responses:
         '200':
@@ -452,3 +496,9 @@ servers:
   variables:
     defaultHost:
       default: localhost:3000
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -63,3 +63,7 @@ end
 
 gem "pagy", "~> 43.6"
 gem "json", "~> 2.7"
+
+gem "bcrypt", "~> 3.1"
+
+gem "jwt", "~> 3.3"

@@ -1,6 +1,9 @@
 require "swagger_helper"
 
 RSpec.describe "Salary Records API", type: :request do
+  let(:user) { create(:user) }
+  let(:token) { JsonWebToken.encode(user_id: user.id) }
+  let(:Authorization) { "Bearer #{token}" }
   path "/api/v1/employees/{employee_id}/salary_records" do
     parameter name: :employee_id,
               in: :path,
@@ -10,6 +13,7 @@ RSpec.describe "Salary Records API", type: :request do
 
     get "List salary records" do
       tags "Salary Records"
+      security [bearerAuth: []]
       produces "application/json"
 
       response "200", "salary records found" do
@@ -79,6 +83,7 @@ RSpec.describe "Salary Records API", type: :request do
 
     post "Create salary record" do
       tags "Salary Records"
+      security [bearerAuth: []]
       consumes "application/json"
       produces "application/json"
 
@@ -156,6 +161,7 @@ RSpec.describe "Salary Records API", type: :request do
 
     get "Show salary record" do
       tags "Salary Records"
+      security [bearerAuth: []]
       produces "application/json"
 
       response "200", "salary record found" do
@@ -224,6 +230,7 @@ RSpec.describe "Salary Records API", type: :request do
 
     patch "Update salary record" do
       tags "Salary Records"
+      security [bearerAuth: []]
       consumes "application/json"
       produces "application/json"
 

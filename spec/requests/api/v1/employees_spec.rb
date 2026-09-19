@@ -1,9 +1,13 @@
 require "swagger_helper"
 
 RSpec.describe "Employees API", type: :request do
+    let(:user) { create(:user) }
+  let(:token) { JsonWebToken.encode(user_id: user.id) }
+  let(:Authorization) { "Bearer #{token}" }
   path "/api/v1/employees" do
     get "List employees" do
       tags "Employees"
+      security [bearerAuth: []]
       produces "application/json"
 
       parameter name: :search,
@@ -77,6 +81,7 @@ RSpec.describe "Employees API", type: :request do
 
     post "Create employee" do
       tags "Employees"
+      security [bearerAuth: []]
       consumes "application/json"
       produces "application/json"
 
@@ -152,6 +157,7 @@ RSpec.describe "Employees API", type: :request do
 
     get "Show employee" do
       tags "Employees"
+      security [bearerAuth: []]
       produces "application/json"
 
       response "200", "employee found" do
@@ -190,6 +196,7 @@ RSpec.describe "Employees API", type: :request do
 
     patch "Update employee" do
       tags "Employees"
+      security [bearerAuth: []]
       consumes "application/json"
       produces "application/json"
 

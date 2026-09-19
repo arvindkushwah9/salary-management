@@ -10,6 +10,11 @@
 # Run with:
 #   bin/rails db:seed
 
+User.find_or_create_by!(email: "hr@example.com") do |user|
+  user.password = "Password123!"
+  user.role = "hr_manager"
+end
+
 require "faker"
 
 EMPLOYEE_COUNT = 10_000
