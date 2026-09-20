@@ -241,6 +241,7 @@ export default function EmployeeDetailsPage() {
                 Current Salary
               </h2>
 
+
               <p className="mt-1 text-sm text-slate-500">
                 Active compensation structure.
               </p>
@@ -252,12 +253,19 @@ export default function EmployeeDetailsPage() {
               </p>
             ) : currentSalary ? (
               <div>
+                <Link
+                  href={`/employees/${employee.id}/salary/${currentSalary.id}/edit`}
+                  className="text-sm font-medium text-blue-600 hover:text-blue-700"
+                >
+                  Edit
+                </Link>
                 <p className="text-3xl font-semibold tracking-tight text-slate-900">
                   {formatCurrency(
                     currentSalary.gross_salary,
                     currentSalary.currency
                   )}
                 </p>
+
 
                 <p className="mt-1 text-sm text-slate-500">
                   Gross salary
@@ -298,16 +306,27 @@ export default function EmployeeDetailsPage() {
         </div>
 
         {/* Salary history */}
+
         <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+          
           <div className="border-b border-slate-200 px-5 py-4">
+          <Link
+            href={`/employees/${employee.id}/salary/new`}
+            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700"
+          >
+            Add Salary Structure
+          </Link>
             <h2 className="font-semibold text-slate-900">
               Salary History
             </h2>
+
 
             <p className="mt-1 text-sm text-slate-500">
               Historical compensation structures for this employee.
             </p>
           </div>
+
+
 
           {salaryLoading ? (
             <div className="flex min-h-[200px] items-center justify-center">
