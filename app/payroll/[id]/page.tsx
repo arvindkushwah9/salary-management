@@ -47,6 +47,8 @@ const paymentStatusStyles: Record<string, string> = {
   paid: "bg-emerald-100 text-emerald-700",
   failed: "bg-red-100 text-red-700",
 };
+import { useToast } from "@/components/ui/ToastProvider";
+import EmptyState from "@/components/ui/EmptyState";
 
 export default function PayrollRunDetailsPage() {
   const params = useParams();
@@ -67,28 +69,32 @@ export default function PayrollRunDetailsPage() {
   const [actionError, setActionError] = useState("");
 
   const [exporting, setExporting] = useState<string | null>(null);
-
+  const { showToast } = useToast();
  const handleExport = async (
       type: "csv" | "xlsx"
     ) => {
       try {
-        setExporting(type);
+          setExporting(type);
 
-        const extension = type;
+          await downloadFile(
+            `/payroll_runs/${id}/export?format=${type}`,
+            `payroll-${payrollRun?.payroll_period}.${type}`
+          );
 
-        await downloadFile(
-          `/payroll_runs/${id}/export?format=${type}`,
-          `payroll-${payrollRun?.payroll_period}.${extension}`
-        );
-      } catch (err) {
-        setActionError(
-          err instanceof Error
-            ? err.message
-            : "Export failed"
-        );
-      } finally {
-        setExporting(null);
-      }
+          showToast(
+            `${type === "csv" ? "CSV" : "Excel"} export downloaded successfully.`,
+            "success"
+          );
+        } catch (err) {
+          showToast(
+            err instanceof Error
+              ? err.message
+              : "Export failed.",
+            "error"
+          );
+        } finally {
+          setExporting(null);
+        }
     };
   const loadPayrollRun = async () => {
     try {
@@ -150,12 +156,25 @@ export default function PayrollRunDetailsPage() {
         );
 
       setPayslips(payslipResponse.data);
+      showToast(
+        `Payroll ${payrollRun.payroll_period} processed successfully.`,
+        "success"
+      );
+
     } catch (err) {
       setActionError(
         err instanceof Error
           ? err.message
           : "Failed to process payroll"
       );
+
+      showToast(
+        err instanceof Error
+          ? err.message
+          : "Failed to process payroll.",
+        "error"
+      );
+
     } finally {
       setProcessing(false);
     }
@@ -183,11 +202,24 @@ export default function PayrollRunDetailsPage() {
       );
 
       setPayrollRun(response.data);
+
+      showToast(
+        `Payroll ${payrollRun.payroll_period} approved successfully.`,
+        "success"
+      );
+
     } catch (err) {
       setActionError(
         err instanceof Error
           ? err.message
           : "Failed to approve payroll"
+      );
+
+      showToast(
+        err instanceof Error
+          ? err.message
+          : "Failed to approve payroll.",
+        "error"
       );
     } finally {
       setApproving(false);
@@ -470,20 +502,10 @@ export default function PayrollRunDetailsPage() {
           </div>
 
           {payslips.length === 0 ? (
-            <div className="px-6 py-12 text-center">
-              <Users
-                size={32}
-                className="mx-auto text-slate-300"
+            <EmptyState
+                title="No payslips yet"
+                description="Process this payroll run to generate payslips."
               />
-
-              <p className="mt-3 text-sm font-medium text-slate-700">
-                No payslips yet
-              </p>
-
-              <p className="mt-1 text-sm text-slate-500">
-                Process this payroll run to generate payslips.
-              </p>
-            </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-slate-200">

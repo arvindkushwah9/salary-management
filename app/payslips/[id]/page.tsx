@@ -28,6 +28,9 @@ import {
 
 import { Download } from "lucide-react";
 import { downloadFile } from "@/lib/api";
+import { useToast } from "@/components/ui/ToastProvider";
+import LoadingState from "@/components/ui/LoadingState";
+import ErrorState from "@/components/ui/ErrorState";
 
 const paymentStatusStyles: Record<string, string> = {
   pending: "bg-amber-100 text-amber-700",
@@ -52,6 +55,8 @@ export default function PayslipDetailsPage() {
   const [error, setError] = useState("");
 
   const [downloadingPdf, setDownloadingPdf] = useState(false);
+  const { showToast } = useToast();
+
 
   const downloadPdf = async () => {
     if (!payslip) return;
@@ -63,11 +68,17 @@ export default function PayslipDetailsPage() {
         `/payslips/${payslip.id}/export?format=pdf`,
         `payslip-${payslip.employee?.employee_code ?? payslip.id}.pdf`
       );
+
+      showToast(
+        "Payslip PDF downloaded successfully.",
+        "success"
+      );
     } catch (err) {
-      setError(
+      showToast(
         err instanceof Error
           ? err.message
-          : "Failed to download payslip"
+          : "Failed to download payslip.",
+        "error"
       );
     } finally {
       setDownloadingPdf(false);
@@ -109,12 +120,7 @@ export default function PayslipDetailsPage() {
   if (loading) {
     return (
       <AppShell>
-        <div className="flex min-h-[400px] items-center justify-center">
-          <div className="flex items-center gap-2 text-sm text-slate-500">
-            <Loader2 size={20} className="animate-spin" />
-            Loading payslip...
-          </div>
-        </div>
+        <LoadingState message="Loading payslip..." />
       </AppShell>
     );
   }
@@ -131,9 +137,10 @@ export default function PayslipDetailsPage() {
             Back to Payroll
           </Link>
 
-          <div className="rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-700">
-            {error || "Payslip not found."}
-          </div>
+          <ErrorState
+              message={error || "Payslip not found."}
+              onRetry={loadPayslip}
+            />
         </div>
       </AppShell>
     );

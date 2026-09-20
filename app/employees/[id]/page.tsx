@@ -24,6 +24,8 @@ import {
   SalaryStructure,
   SalaryStructureListResponse,
 } from "@/lib/types";
+import LoadingState from "@/components/ui/LoadingState";
+import ErrorState from "@/components/ui/ErrorState";
 
 export default function EmployeeDetailsPage() {
   const params = useParams();
@@ -91,11 +93,7 @@ export default function EmployeeDetailsPage() {
   if (loading) {
     return (
       <AppShell>
-        <div className="flex min-h-[400px] items-center justify-center">
-          <p className="text-sm text-slate-500">
-            Loading employee...
-          </p>
-        </div>
+        <LoadingState message="Loading employees..." />
       </AppShell>
     );
   }
@@ -112,9 +110,10 @@ export default function EmployeeDetailsPage() {
             Back to employees
           </Link>
 
-          <div className="rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-700">
-            {error || "Employee not found"}
-          </div>
+          <EmptyState
+            title="No employees found"
+            description="Try changing your search or filter criteria."
+          />
         </div>
       </AppShell>
     );

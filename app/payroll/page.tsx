@@ -5,14 +5,15 @@ import Link from "next/link";
 import {
   Plus,
   Eye,
-  Loader2,
   WalletCards,
+  CircleAlert,
 } from "lucide-react";
 
 import AppShell from "@/components/layout/AppShell";
 import { apiFetch } from "@/lib/api";
 import { PayrollRun, PayrollRunListResponse } from "@/lib/types";
 import { formatCurrency, formatDate } from "@/lib/formatters";
+import TableState from "@/components/ui/TableState";
 
 const statusStyles: Record<string, string> = {
   draft: "bg-slate-100 text-slate-700",
@@ -83,13 +84,6 @@ export default function PayrollPage() {
           </Link>
         </div>
 
-        {/* Error */}
-        {error && (
-          <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-            {error}
-          </div>
-        )}
-
         {/* Table */}
         <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
           <div className="overflow-x-auto">
@@ -132,29 +126,42 @@ export default function PayrollPage() {
 
               <tbody className="divide-y divide-slate-100">
                 {loading ? (
+                  <TableState
+                    colSpan={8}
+                    loading
+                    loadingMessage="Loading payroll runs..."
+                  />
+                ) : error ? (
                   <tr>
-                    <td
-                      colSpan={8}
-                      className="px-6 py-12 text-center"
-                    >
-                      <div className="flex items-center justify-center gap-2 text-sm text-slate-500">
-                        <Loader2
-                          size={18}
-                          className="animate-spin"
-                        />
-                        Loading payroll runs...
+                    <td colSpan={8} className="px-6 py-12 text-center">
+                      <div className="flex flex-col items-center">
+                        <div className="rounded-full bg-red-50 p-3 text-red-500">
+                          <CircleAlert size={22} />
+                        </div>
+
+                        <p className="mt-3 text-sm font-medium text-slate-700">
+                          Unable to load payroll runs
+                        </p>
+
+                        <p className="mt-1 max-w-md text-sm text-slate-500">
+                          {error}
+                        </p>
+
+                        <button
+                          type="button"
+                          onClick={loadPayrollRuns}
+                          className="mt-4 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50"
+                        >
+                          Try again
+                        </button>
                       </div>
                     </td>
                   </tr>
                 ) : payrollRuns.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={8}
-                      className="px-6 py-12 text-center text-sm text-slate-500"
-                    >
-                      No payroll runs found.
-                    </td>
-                  </tr>
+                  <TableState
+                    colSpan={8}
+                    emptyMessage="No payroll runs found."
+                  />
                 ) : (
                   payrollRuns.map((payroll) => (
                     <tr
