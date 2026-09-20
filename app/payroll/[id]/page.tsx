@@ -27,6 +27,14 @@ import {
   formatDate,
 } from "@/lib/formatters";
 
+import {
+  Download,
+  FileSpreadsheet,
+  FileText,
+} from "lucide-react";
+
+import { downloadFile } from "@/lib/api";
+
 const statusStyles: Record<string, string> = {
   draft: "bg-slate-100 text-slate-700",
   processing: "bg-blue-100 text-blue-700",
@@ -58,6 +66,30 @@ export default function PayrollRunDetailsPage() {
   const [error, setError] = useState("");
   const [actionError, setActionError] = useState("");
 
+  const [exporting, setExporting] = useState<string | null>(null);
+
+ const handleExport = async (
+      type: "csv" | "xlsx"
+    ) => {
+      try {
+        setExporting(type);
+
+        const extension = type;
+
+        await downloadFile(
+          `/payroll_runs/${id}/export?format=${type}`,
+          `payroll-${payrollRun?.payroll_period}.${extension}`
+        );
+      } catch (err) {
+        setActionError(
+          err instanceof Error
+            ? err.message
+            : "Export failed"
+        );
+      } finally {
+        setExporting(null);
+      }
+    };
   const loadPayrollRun = async () => {
     try {
       setLoading(true);
@@ -290,6 +322,36 @@ export default function PayrollRunDetailsPage() {
                 )}
               </button>
             )}
+
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={() => handleExport("csv")}
+                disabled={!!exporting}
+                className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+              >
+                {exporting === "csv" ? (
+                  <Loader2 size={16} className="animate-spin" />
+                ) : (
+                  <FileText size={16} />
+                )}
+                CSV
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleExport("xlsx")}
+                disabled={!!exporting}
+                className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+              >
+                {exporting === "xlsx" ? (
+                  <Loader2 size={16} className="animate-spin" />
+                ) : (
+                  <FileSpreadsheet size={16} />
+                )}
+                Excel
+              </button>
+            </div>
           </div>
         </div>
 

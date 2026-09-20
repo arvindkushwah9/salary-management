@@ -119,6 +119,7 @@ export type PayslipEmployee = {
 export type Payslip = {
   id: string;
   payroll_run_id: string;
+  currency: string;
   employee_id: string;
   employee: PayslipEmployee;
   working_days: number;
@@ -134,4 +135,29 @@ export type Payslip = {
 
 export type PayslipListResponse = {
   data: Payslip[];
+};
+
+export type PayslipItemType =
+  | "earning"
+  | "deduction"
+  | "statutory"
+  | string;
+
+export type PayslipItem = {
+  id: string;
+  payslip_id: string;
+  item_type: PayslipItemType;
+  code: string;
+  description: string | null;
+  amount: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type PayslipItemListResponse = {
+  data: PayslipItem[];
+};
+
+export type PayslipResponse = {
+  data: Payslip;
 };
