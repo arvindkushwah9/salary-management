@@ -69,3 +69,9 @@ gem "bcrypt", "~> 3.1"
 gem "jwt", "~> 3.3"
 
 gem "rack-cors", "~> 3.0"
+
+
+gem "caxlsx"
+gem "prawn"
+gem "matrix", "~> 0.4"
+gem "prawn-table"
