@@ -42,4 +42,13 @@ class Payslip < ApplicationRecord
               scope: :payroll_run_id,
               message: "already has a payslip for this payroll run"
             }
+  validate :paid_days_cannot_exceed_working_days
+
+  def paid_days_cannot_exceed_working_days
+    return if paid_days.blank? || working_days.blank?
+
+    if paid_days > working_days
+      errors.add(:paid_days, "cannot exceed working_days")
+    end
+  end
 end

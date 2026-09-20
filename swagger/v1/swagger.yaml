@@ -374,6 +374,480 @@ paths:
                 joined_date:
                   type: string
         required: true
+  "/api/v1/payroll_runs":
+    get:
+      summary: List payroll runs
+      tags:
+      - Payroll Runs
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: payroll runs found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        payroll_period:
+                          type: string
+                          example: 2026-09
+                        status:
+                          type: string
+                          example: draft
+                        total_gross:
+                          type: number
+                        total_deductions:
+                          type: number
+                        total_net:
+                          type: number
+                        approved_by:
+                          type: string
+                          format: uuid
+                          nullable: true
+                        approved_at:
+                          type: string
+                          format: date-time
+                          nullable: true
+                      required:
+                      - id
+                      - payroll_period
+                      - status
+                      - total_gross
+                      - total_deductions
+                      - total_net
+                required:
+                - data
+        '401':
+          description: authentication required
+    post:
+      summary: Create payroll run
+      tags:
+      - Payroll Runs
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+      security:
+      - bearerAuth: []
+      responses:
+        '201':
+          description: payroll run created
+        '422':
+          description: duplicate payroll period
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                payroll_run:
+                  type: object
+                  properties:
+                    payroll_period:
+                      type: string
+                      example: 2026-09
+                  required:
+                  - payroll_period
+        required: true
+  "/api/v1/payroll_runs/{id}":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      summary: Show payroll run
+      tags:
+      - Payroll Runs
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: payroll run found
+        '404':
+          description: payroll run not found
+    patch:
+      summary: Update payroll run
+      tags:
+      - Payroll Runs
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: payroll run updated
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                payroll_run:
+                  type: object
+                  properties:
+                    payroll_period:
+                      type: string
+                      example: 2026-10
+        required: true
+    delete:
+      summary: Delete payroll run
+      tags:
+      - Payroll Runs
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+      security:
+      - bearerAuth: []
+      responses:
+        '204':
+          description: payroll run deleted
+  "/api/v1/payroll_runs/{id}/approve":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      summary: Approve payroll run
+      tags:
+      - Payroll Runs
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: payroll run approved
+  "/api/v1/payroll_runs/{id}/process":
+    post:
+      summary: Process a payroll run
+      tags:
+      - Payroll Runs
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: payroll processed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      payroll_period:
+                        type: string
+                      status:
+                        type: string
+                      total_gross:
+                        type: number
+                      total_deductions:
+                        type: number
+                      total_net:
+                        type: number
+                    required:
+                    - id
+                    - payroll_period
+                    - status
+                    - total_gross
+                    - total_deductions
+                    - total_net
+  "/api/v1/payslips/{payslip_id}/payslip_items":
+    parameters:
+    - name: payslip_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      summary: List payslip items
+      tags:
+      - Payslip Items
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: payslip items found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        payslip_id:
+                          type: string
+                          format: uuid
+                        item_type:
+                          type: string
+                          example: earning
+                        code:
+                          type: string
+                          example: BASIC
+                        description:
+                          type: string
+                          nullable: true
+                        amount:
+                          type: number
+                          example: 100000.0
+                      required:
+                      - id
+                      - payslip_id
+                      - item_type
+                      - code
+                      - amount
+                required:
+                - data
+        '401':
+          description: authentication required
+        '404':
+          description: payslip not found
+    post:
+      summary: Create payslip item
+      tags:
+      - Payslip Items
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+      security:
+      - bearerAuth: []
+      responses:
+        '201':
+          description: payslip item created
+        '422':
+          description: missing required fields
+        '401':
+          description: authentication required
+        '404':
+          description: payslip not found
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                payslip_item:
+                  type: object
+                  properties:
+                    item_type:
+                      type: string
+                      enum:
+                      - earning
+                      - deduction
+                      - statutory
+                      example: earning
+                    code:
+                      type: string
+                      example: BONUS
+                    description:
+                      type: string
+                      example: Performance bonus
+                    amount:
+                      type: number
+                      example: 15000.0
+                  required:
+                  - item_type
+                  - code
+                  - amount
+        required: true
+  "/api/v1/payroll_runs/{payroll_run_id}/payslips":
+    parameters:
+    - name: payroll_run_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      summary: List payslips for payroll run
+      tags:
+      - Payslips
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: payslips found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        payroll_run_id:
+                          type: string
+                          format: uuid
+                        employee_id:
+                          type: string
+                          format: uuid
+                        working_days:
+                          type: integer
+                        paid_days:
+                          type: number
+                        gross_earnings:
+                          type: number
+                        total_deductions:
+                          type: number
+                        net_pay:
+                          type: number
+                        payment_status:
+                          type: string
+                        payslip_pdf_url:
+                          type: string
+                          nullable: true
+                      required:
+                      - id
+                      - payroll_run_id
+                      - employee_id
+                      - working_days
+                      - paid_days
+                      - gross_earnings
+                      - total_deductions
+                      - net_pay
+                      - payment_status
+                required:
+                - data
+        '401':
+          description: authentication required
+        '404':
+          description: payroll run not found
+  "/api/v1/employees/{id}/payslips":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      summary: List payslips for employee
+      tags:
+      - Payslips
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: employee payslips found
+        '401':
+          description: authentication required
+        '404':
+          description: employee not found
+  "/api/v1/payslips/{id}":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      summary: Show payslip
+      tags:
+      - Payslips
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: payslip found
+        '401':
+          description: authentication required
+        '404':
+          description: payslip not found
   "/api/v1/employees/{employee_id}/salary_structures":
     parameters:
     - name: employee_id

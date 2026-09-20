@@ -5,7 +5,7 @@ module Api
         show
         update
         destroy
-        process
+        process_payroll
         approve
       ]
 
@@ -54,7 +54,7 @@ module Api
         head :no_content
       end
 
-      def process
+      def process_payroll
         Payroll::ProcessService.new(@payroll_run).call
 
         render json: {

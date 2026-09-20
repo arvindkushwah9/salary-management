@@ -6,6 +6,8 @@ module Payroll
 
     def call
       PayrollRun.transaction do
+        validate_payroll_run!
+
         @payroll_run.update!(status: "processing")
 
         Employee.active.find_each do |employee|
@@ -22,14 +24,22 @@ module Payroll
 
     private
 
+    def validate_payroll_run!
+      unless @payroll_run.status == "draft"
+        raise ArgumentError,
+              "Only draft payroll runs can be processed"
+      end
+    end
+
     def process_employee(employee)
       salary = employee.current_salary
+
       return unless salary
 
       payslip = @payroll_run.payslips.create!(
         employee: employee,
-        working_days: 30,
-        paid_days: 30,
+        working_days: working_days,
+        paid_days: working_days,
         gross_earnings: salary.gross_salary,
         total_deductions: 0,
         net_pay: salary.gross_salary,
@@ -84,6 +94,12 @@ module Payroll
         total_deductions: @payroll_run.payslips.sum(:total_deductions),
         total_net: @payroll_run.payslips.sum(:net_pay)
       )
+    end
+
+    def working_days
+      # Payroll-period working-day calculation is not defined yet.
+      # Use the calendar days for the assessment's initial payroll snapshot.
+      Date.parse("#{@payroll_run.payroll_period}-01").end_of_month.day
     end
   end
 end

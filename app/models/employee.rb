@@ -74,6 +74,7 @@ class Employee < ApplicationRecord
   def current_salary
     salary_structures
       .where("effective_from <= ?", Date.current)
+      .where("effective_to IS NULL OR effective_to >= ?", Date.current)
       .order(effective_from: :desc)
       .first
   end

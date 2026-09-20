@@ -16,6 +16,8 @@ Rails.application.routes.draw do
 
       resources :employees do
         resources :salary_structures, only: %i[index create show update]
+        get :payslips, to: "payslips#employee_index", on: :member
+
       end
 
       get "dashboard", to: "dashboard#show"
@@ -23,18 +25,14 @@ Rails.application.routes.draw do
 
       resources :payroll_runs do
         member do
-          post :process
+          post :process, action: :process_payroll
           post :approve
         end
 
         resources :payslips, only: %i[index show]
       end
 
-      resources :employees do
-        resources :payslips, only: :index
-      end
-
-      resources :payslips, only: [] do
+      resources :payslips, only: :show do
         resources :payslip_items, only: %i[index create]
       end
     end
