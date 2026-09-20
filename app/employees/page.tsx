@@ -135,9 +135,9 @@ export default function EmployeesPage() {
 
           <Link
             href="/employees/new"
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-500"
+            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700"
           >
-            <Plus size={18} />
+            <Plus className="h-4 w-4" />
             Add Employee
           </Link>
         </div>

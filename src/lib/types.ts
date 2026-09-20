@@ -76,3 +76,7 @@ export type SalaryStructureListResponse = {
 export type SalaryStructureResponse = {
   data: SalaryStructure;
 };
+
+export type DepartmentListResponse = {
+  data: Department[];
+};
