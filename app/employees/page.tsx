@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   ChevronLeft,
   ChevronRight,
@@ -20,19 +20,22 @@ import {
   Department,
   Employee,
   EmployeeListResponse,
+  DepartmentListResponse,
 } from "@/lib/types";
 import { formatDate } from "@/lib/formatters";
 const PAGE_SIZE = 20;
 
 export default function EmployeesPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [employees, setEmployees] = useState<Employee[]>([]);
-  const departments: Department[] = [];
+  const [departments, setDepartments] = useState<Department[]>([]);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const [country, setCountry] = useState("");
   const [departmentId, setDepartmentId] = useState("");
+  const [hasSalary, setHasSalary] = useState(false);
 
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -52,14 +55,51 @@ export default function EmployeesPage() {
   }, [router]);
 
   useEffect(() => {
-    if (!isAuthenticated()) return;
+      if (!isAuthenticated()) return;
 
-    const timer = setTimeout(() => {
-      loadEmployees();
-    }, 250);
+      const timer = setTimeout(() => {
+        loadEmployees();
+      }, 250);
 
-    return () => clearTimeout(timer);
-  }, [page, search, status, country, departmentId]);
+      return () => clearTimeout(timer);
+    }, [
+      page,
+      search,
+      status,
+      hasSalary,
+      country,
+      departmentId,
+    ]);
+
+  useEffect(() => {
+    const urlStatus = searchParams.get("status") || "";
+    const urlHasSalary = searchParams.get("has_salary") === "true";
+
+    setStatus(urlStatus);
+    setHasSalary(urlHasSalary);
+    setPage(1);
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (!isAuthenticated()) {
+      router.replace("/login");
+      return;
+    }
+
+    loadDepartments();
+  }, [router]);
+
+
+  async function loadDepartments() {
+    try {
+      const response =
+        await apiFetch<DepartmentListResponse>("/departments");
+
+      setDepartments(response.data);
+    } catch {
+      setDepartments([]);
+    }
+  }
 
   async function loadEmployees() {
     try {
@@ -85,6 +125,10 @@ export default function EmployeesPage() {
 
       if (departmentId) {
         params.set("department_id", departmentId);
+      }
+
+      if (hasSalary) {
+        params.set("has_salary", "true");
       }
 
       const response = await apiFetch<EmployeeListResponse>(

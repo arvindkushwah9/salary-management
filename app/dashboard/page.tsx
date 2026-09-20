@@ -110,6 +110,7 @@ export default function DashboardPage() {
             value={dashboard.employees.total.toLocaleString()}
             description={`${dashboard.countries.count} countries`}
             icon={Users}
+            href="/employees"
           />
 
           <StatCard
@@ -121,6 +122,7 @@ export default function DashboardPage() {
               100
             ).toFixed(1)}% of workforce`}
             icon={UserCheck}
+            href="/employees?status=active"
           />
 
           <StatCard
@@ -128,6 +130,7 @@ export default function DashboardPage() {
             value={dashboard.employees.inactive.toLocaleString()}
             description="Currently inactive"
             icon={UserMinus}
+            href="/employees?status=inactive"
           />
 
           <StatCard
@@ -135,6 +138,7 @@ export default function DashboardPage() {
             value={dashboard.salary.employees_with_salary.toLocaleString()}
             description={`${dashboard.salary.currencies.length} currencies`}
             icon={CircleDollarSign}
+            href="/employees?has_salary=true"
           />
         </div>
 
