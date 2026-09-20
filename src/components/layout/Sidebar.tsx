@@ -9,6 +9,7 @@ import {
   LayoutDashboard,
   LogOut,
   Users,
+  WalletCards,
 } from "lucide-react";
 import { clearAuth } from "@/lib/auth";
 
@@ -22,6 +23,11 @@ const navigation = [
     name: "Employees",
     href: "/employees",
     icon: Users,
+  },
+  {
+    name: "Payroll",
+    href: "/payroll",
+    icon: WalletCards,
   },
 ];
 

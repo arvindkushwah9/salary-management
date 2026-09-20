@@ -80,3 +80,58 @@ export type SalaryStructureResponse = {
 export type DepartmentListResponse = {
   data: Department[];
 };
+
+export type PayrollRunStatus =
+  | "draft"
+  | "processing"
+  | "approved"
+  | "disbursed";
+
+export type PayrollRun = {
+  id: string;
+  payroll_period: string;
+  currency: string;
+  status: PayrollRunStatus;
+  total_gross: number;
+  total_deductions: number;
+  total_net: number;
+  approved_by: string | null;
+  approved_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type PayrollRunListResponse = {
+  data: PayrollRun[];
+};
+
+export type PayrollRunResponse = {
+  data: PayrollRun;
+};
+
+export type PayslipEmployee = {
+  id: string;
+  employee_code: string;
+  full_name: string;
+  email: string;
+};
+
+export type Payslip = {
+  id: string;
+  payroll_run_id: string;
+  employee_id: string;
+  employee: PayslipEmployee;
+  working_days: number;
+  paid_days: number;
+  gross_earnings: number;
+  total_deductions: number;
+  net_pay: number;
+  payment_status: "pending" | "paid" | "failed" | string;
+  payslip_pdf_url: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type PayslipListResponse = {
+  data: Payslip[];
+};
