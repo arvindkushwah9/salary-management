@@ -1,0 +1,1072 @@
+---
+openapi: 3.0.1
+info:
+  title: API V1
+  version: v1
+paths:
+  "/api/v1/auth/login":
+    post:
+      summary: Login
+      tags:
+      - Authentication
+      parameters: []
+      responses:
+        '200':
+          description: login successful
+        '401':
+          description: invalid credentials
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - email
+              - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+        required: true
+  "/api/v1/dashboard":
+    get:
+      summary: Get dashboard summary
+      tags:
+      - Dashboard
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: dashboard summary returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      employees:
+                        type: object
+                        properties:
+                          total:
+                            type: integer
+                          active:
+                            type: integer
+                          inactive:
+                            type: integer
+                        required:
+                        - total
+                        - active
+                        - inactive
+                      countries:
+                        type: object
+                        properties:
+                          count:
+                            type: integer
+                          employee_count_by_country:
+                            type: object
+                            additionalProperties:
+                              type: integer
+                        required:
+                        - count
+                        - employee_count_by_country
+                      salary:
+                        type: object
+                        properties:
+                          employees_with_salary:
+                            type: integer
+                          currencies:
+                            type: array
+                            items:
+                              type: string
+                          statistics_by_currency:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                currency:
+                                  type: string
+                                minimum:
+                                  type: number
+                                maximum:
+                                  type: number
+                                average:
+                                  type: number
+                              required:
+                              - currency
+                              - minimum
+                              - maximum
+                              - average
+                        required:
+                        - employees_with_salary
+                        - currencies
+                        - statistics_by_currency
+                    required:
+                    - employees
+                    - countries
+                    - salary
+                required:
+                - data
+  "/api/v1/departments":
+    get:
+      summary: List departments
+      tags:
+      - Departments
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: departments found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        code:
+                          type: string
+                        name:
+                          type: string
+                      required:
+                      - id
+                      - code
+                      - name
+                required:
+                - data
+  "/api/v1/employees":
+    get:
+      summary: List employees
+      tags:
+      - Employees
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: search
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: country
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: department
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+      - name: per_page
+        in: query
+        required: false
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: employees found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        employee_code:
+                          type: string
+                        first_name:
+                          type: string
+                        last_name:
+                          type: string
+                        full_name:
+                          type: string
+                        email:
+                          type: string
+                        country:
+                          type: string
+                        department:
+                          type: object
+                          nullable: true
+                          properties:
+                            id:
+                              type: string
+                              format: uuid
+                            code:
+                              type: string
+                            name:
+                              type: string
+                            created_at:
+                              type: string
+                              format: date-time
+                            updated_at:
+                              type: string
+                              format: date-time
+                          required:
+                          - id
+                          - code
+                          - name
+                        designation:
+                          type: string
+                        status:
+                          type: string
+                        joined_date:
+                          type: string
+                  meta:
+                    type: object
+                    properties:
+                      page:
+                        type: integer
+                      per_page:
+                        type: integer
+                      total:
+                        type: integer
+                      pages:
+                        type: integer
+                required:
+                - data
+                - meta
+    post:
+      summary: Create employee
+      tags:
+      - Employees
+      security:
+      - bearerAuth: []
+      parameters: []
+      responses:
+        '201':
+          description: employee created
+        '422':
+          description: invalid employee
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - employee_code
+              - first_name
+              - last_name
+              - email
+              - department_id
+              - designation
+              - country
+              - status
+              - joined_date
+              properties:
+                employee_code:
+                  type: string
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+                email:
+                  type: string
+                department_id:
+                  type: string
+                  format: uuid
+                designation:
+                  type: string
+                country:
+                  type: string
+                status:
+                  type: string
+                joined_date:
+                  type: string
+        required: true
+  "/api/v1/employees/{id}":
+    parameters:
+    - name: id
+      in: path
+      format: uuid
+      required: true
+      schema:
+        type: string
+    get:
+      summary: Show employee
+      tags:
+      - Employees
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: employee found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      employee_code:
+                        type: string
+                      first_name:
+                        type: string
+                      last_name:
+                        type: string
+                      full_name:
+                        type: string
+                      email:
+                        type: string
+                      country:
+                        type: string
+                      department:
+                        type: object
+                        nullable: true
+                        properties:
+                          id:
+                            type: string
+                            format: uuid
+                          code:
+                            type: string
+                          name:
+                            type: string
+                          created_at:
+                            type: string
+                            format: date-time
+                          updated_at:
+                            type: string
+                            format: date-time
+                        required:
+                        - id
+                        - code
+                        - name
+                      designation:
+                        type: string
+                      status:
+                        type: string
+                      joined_date:
+                        type: string
+                required:
+                - data
+        '404':
+          description: employee not found
+    patch:
+      summary: Update employee
+      tags:
+      - Employees
+      security:
+      - bearerAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: employee updated
+        '422':
+          description: invalid employee update
+        '404':
+          description: employee not found
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+                email:
+                  type: string
+                department_id:
+                  type: string
+                  format: uuid
+                designation:
+                  type: string
+                country:
+                  type: string
+                status:
+                  type: string
+                joined_date:
+                  type: string
+        required: true
+  "/api/v1/payroll_runs":
+    get:
+      summary: List payroll runs
+      tags:
+      - Payroll Runs
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: payroll runs found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        payroll_period:
+                          type: string
+                          example: 2026-09
+                        currency:
+                          type: string
+                          example: USD
+                        status:
+                          type: string
+                          example: draft
+                        total_gross:
+                          type: number
+                        total_deductions:
+                          type: number
+                        total_net:
+                          type: number
+                        approved_by:
+                          type: string
+                          format: uuid
+                          nullable: true
+                        approved_at:
+                          type: string
+                          format: date-time
+                          nullable: true
+                      required:
+                      - id
+                      - payroll_period
+                      - currency
+                      - status
+                      - total_gross
+                      - total_deductions
+                      - total_net
+                required:
+                - data
+        '401':
+          description: authentication required
+    post:
+      summary: Create payroll run
+      tags:
+      - Payroll Runs
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+      security:
+      - bearerAuth: []
+      responses:
+        '201':
+          description: same period allowed for another currency
+        '422':
+          description: duplicate payroll period and currency
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                payroll_run:
+                  type: object
+                  properties:
+                    payroll_period:
+                      type: string
+                      example: 2026-09
+                    currency:
+                      type: string
+                      example: USD
+                  required:
+                  - payroll_period
+                  - currency
+        required: true
+  "/api/v1/payroll_runs/{id}":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      summary: Show payroll run
+      tags:
+      - Payroll Runs
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: payroll run found
+        '404':
+          description: payroll run not found
+    patch:
+      summary: Update payroll run
+      tags:
+      - Payroll Runs
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: payroll run updated
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                payroll_run:
+                  type: object
+                  properties:
+                    payroll_period:
+                      type: string
+                      example: 2026-10
+                    currency:
+                      type: string
+                      example: USD
+        required: true
+    delete:
+      summary: Delete payroll run
+      tags:
+      - Payroll Runs
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+      security:
+      - bearerAuth: []
+      responses:
+        '204':
+          description: payroll run deleted
+  "/api/v1/payroll_runs/{id}/approve":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      summary: Approve payroll run
+      tags:
+      - Payroll Runs
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: payroll run approved
+  "/api/v1/payroll_runs/{id}/process":
+    post:
+      summary: Process a payroll run
+      tags:
+      - Payroll Runs
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: payroll processed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      payroll_period:
+                        type: string
+                      currency:
+                        type: string
+                      status:
+                        type: string
+                      total_gross:
+                        type: number
+                      total_deductions:
+                        type: number
+                      total_net:
+                        type: number
+                    required:
+                    - id
+                    - payroll_period
+                    - currency
+                    - status
+                    - total_gross
+                    - total_deductions
+                    - total_net
+  "/api/v1/payslips/{payslip_id}/payslip_items":
+    parameters:
+    - name: payslip_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      summary: List payslip items
+      tags:
+      - Payslip Items
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: payslip items found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        payslip_id:
+                          type: string
+                          format: uuid
+                        item_type:
+                          type: string
+                          example: earning
+                        code:
+                          type: string
+                          example: BASIC
+                        description:
+                          type: string
+                          nullable: true
+                        amount:
+                          type: number
+                          example: 100000.0
+                      required:
+                      - id
+                      - payslip_id
+                      - item_type
+                      - code
+                      - amount
+                required:
+                - data
+        '401':
+          description: authentication required
+        '404':
+          description: payslip not found
+    post:
+      summary: Create payslip item
+      tags:
+      - Payslip Items
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+      security:
+      - bearerAuth: []
+      responses:
+        '201':
+          description: payslip item created
+        '422':
+          description: missing required fields
+        '401':
+          description: authentication required
+        '404':
+          description: payslip not found
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                payslip_item:
+                  type: object
+                  properties:
+                    item_type:
+                      type: string
+                      enum:
+                      - earning
+                      - deduction
+                      - statutory
+                      example: earning
+                    code:
+                      type: string
+                      example: BONUS
+                    description:
+                      type: string
+                      example: Performance bonus
+                    amount:
+                      type: number
+                      example: 15000.0
+                  required:
+                  - item_type
+                  - code
+                  - amount
+        required: true
+  "/api/v1/payroll_runs/{payroll_run_id}/payslips":
+    parameters:
+    - name: payroll_run_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      summary: List payslips for payroll run
+      tags:
+      - Payslips
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: payslips found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        payroll_run_id:
+                          type: string
+                          format: uuid
+                        employee_id:
+                          type: string
+                          format: uuid
+                        working_days:
+                          type: integer
+                        paid_days:
+                          type: number
+                        gross_earnings:
+                          type: number
+                        total_deductions:
+                          type: number
+                        net_pay:
+                          type: number
+                        payment_status:
+                          type: string
+                        payslip_pdf_url:
+                          type: string
+                          nullable: true
+                      required:
+                      - id
+                      - payroll_run_id
+                      - employee_id
+                      - working_days
+                      - paid_days
+                      - gross_earnings
+                      - total_deductions
+                      - net_pay
+                      - payment_status
+                required:
+                - data
+        '401':
+          description: authentication required
+        '404':
+          description: payroll run not found
+  "/api/v1/employees/{id}/payslips":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      summary: List payslips for employee
+      tags:
+      - Payslips
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: employee payslips found
+        '401':
+          description: authentication required
+        '404':
+          description: employee not found
+  "/api/v1/payslips/{id}":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      summary: Show payslip
+      tags:
+      - Payslips
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: payslip found
+        '401':
+          description: authentication required
+        '404':
+          description: payslip not found
+  "/api/v1/employees/{employee_id}/salary_structures":
+    parameters:
+    - name: employee_id
+      in: path
+      format: uuid
+      required: true
+      schema:
+        type: string
+    get:
+      summary: List Salary Structures
+      tags:
+      - Salary Structures
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Salary Structures found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        employee_id:
+                          type: string
+                          format: uuid
+                        base_salary:
+                          type: number
+                        currency:
+                          type: string
+                        effective_from:
+                          type: string
+                          format: date
+                      required:
+                      - id
+                      - employee_id
+                      - base_salary
+                      - currency
+                      - effective_from
+                required:
+                - data
+        '404':
+          description: employee not found
+    post:
+      summary: Create salary record
+      tags:
+      - Salary Structures
+      security:
+      - bearerAuth: []
+      parameters: []
+      responses:
+        '201':
+          description: salary record created
+        '422':
+          description: invalid salary record
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_salary:
+                  type: number
+                  format: double
+                  minimum: 0
+                currency:
+                  type: string
+                  minLength: 3
+                  maxLength: 3
+                effective_from:
+                  type: string
+                  format: date
+        required: true
+  "/api/v1/employees/{employee_id}/salary_structures/{id}":
+    parameters:
+    - name: employee_id
+      in: path
+      format: uuid
+      required: true
+      schema:
+        type: string
+    - name: id
+      in: path
+      format: uuid
+      required: true
+      schema:
+        type: string
+    get:
+      summary: Show salary record
+      tags:
+      - Salary Structures
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: salary record found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      employee_id:
+                        type: string
+                        format: uuid
+                      base_salary:
+                        type: number
+                      currency:
+                        type: string
+                      effective_from:
+                        type: string
+                        format: date
+                    required:
+                    - id
+                    - employee_id
+                    - base_salary
+                    - currency
+                    - effective_from
+                required:
+                - data
+        '404':
+          description: salary record belongs to another employee
+    patch:
+      summary: Update salary record
+      tags:
+      - Salary Structures
+      security:
+      - bearerAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: salary record updated
+        '422':
+          description: invalid salary record update
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_salary:
+                  type: number
+                  format: double
+                  minimum: 0
+                currency:
+                  type: string
+                  minLength: 3
+                  maxLength: 3
+                effective_from:
+                  type: string
+                  format: date
+        required: true
+servers:
+- url: http://{defaultHost}
+  variables:
+    defaultHost:
+      default: localhost:3001
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
