@@ -35,6 +35,7 @@ module Payroll
       salary = employee.current_salary
 
       return unless salary
+      return unless salary.currency == @payroll_run.currency
 
       payslip = @payroll_run.payslips.create!(
         employee: employee,

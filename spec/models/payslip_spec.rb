@@ -121,4 +121,53 @@ RSpec.describe Payslip, type: :model do
       expect(association.macro).to eq(:has_many)
     end
   end
+
+  describe "#recalculate_totals!" do
+    let(:payslip) do
+      create(
+        :payslip,
+        gross_earnings: 120_000,
+        total_deductions: 0,
+        net_pay: 120_000
+      )
+    end
+
+    it "calculates deductions and net pay from deduction items" do
+      create(
+        :payslip_item,
+        payslip: payslip,
+        item_type: "deduction",
+        code: "PF",
+        amount: 5_000
+      )
+
+      create(
+        :payslip_item,
+        payslip: payslip,
+        item_type: "statutory",
+        code: "TAX",
+        amount: 10_000
+      )
+
+      payslip.recalculate_totals!
+
+      expect(payslip.total_deductions).to eq(15_000)
+      expect(payslip.net_pay).to eq(105_000)
+    end
+  end
+
+  it "does not count earning items as deductions" do
+    create(
+      :payslip_item,
+      payslip: payslip,
+      item_type: "earning",
+      code: "BONUS",
+      amount: 10_000
+    )
+
+    payslip.recalculate_totals!
+
+    expect(payslip.total_deductions).to eq(0)
+    expect(payslip.net_pay).to eq(120_000)
+  end
 end

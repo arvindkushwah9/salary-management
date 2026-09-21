@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_19_130212) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_20_051423) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -48,13 +48,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_19_130212) do
     t.datetime "approved_at"
     t.uuid "approved_by"
     t.datetime "created_at", null: false
+    t.string "currency", limit: 3, default: "USD", null: false
     t.string "payroll_period", limit: 7, null: false
     t.string "status", default: "draft", null: false
     t.decimal "total_deductions", precision: 14, scale: 2, default: "0.0", null: false
     t.decimal "total_gross", precision: 14, scale: 2, default: "0.0", null: false
     t.decimal "total_net", precision: 14, scale: 2, default: "0.0", null: false
     t.datetime "updated_at", null: false
-    t.index ["payroll_period"], name: "index_payroll_runs_on_payroll_period", unique: true
+    t.index ["currency"], name: "index_payroll_runs_on_currency"
+    t.index ["payroll_period", "currency"], name: "index_payroll_runs_on_period_and_currency", unique: true
     t.index ["status"], name: "index_payroll_runs_on_status"
   end
 

@@ -1,9 +1,5 @@
 class Payslip < ApplicationRecord
-  PAYMENT_STATUSES = %w[
-    pending
-    paid
-    failed
-  ].freeze
+  PAYMENT_STATUSES = %w[pending paid failed].freeze
 
   belongs_to :payroll_run
   belongs_to :employee
@@ -42,7 +38,21 @@ class Payslip < ApplicationRecord
               scope: :payroll_run_id,
               message: "already has a payslip for this payroll run"
             }
+
   validate :paid_days_cannot_exceed_working_days
+
+  def recalculate_totals!
+    deductions = payslip_items
+      .where(item_type: %w[deduction statutory])
+      .sum(:amount)
+
+    update!(
+      total_deductions: deductions,
+      net_pay: gross_earnings - deductions
+    )
+  end
+
+  private
 
   def paid_days_cannot_exceed_working_days
     return if paid_days.blank? || working_days.blank?

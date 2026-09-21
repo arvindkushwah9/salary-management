@@ -110,6 +110,39 @@ paths:
                     - salary
                 required:
                 - data
+  "/api/v1/departments":
+    get:
+      summary: List departments
+      tags:
+      - Departments
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: departments found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        code:
+                          type: string
+                        name:
+                          type: string
+                      required:
+                      - id
+                      - code
+                      - name
+                required:
+                - data
   "/api/v1/employees":
     get:
       summary: List employees
@@ -406,6 +439,9 @@ paths:
                         payroll_period:
                           type: string
                           example: 2026-09
+                        currency:
+                          type: string
+                          example: USD
                         status:
                           type: string
                           example: draft
@@ -426,6 +462,7 @@ paths:
                       required:
                       - id
                       - payroll_period
+                      - currency
                       - status
                       - total_gross
                       - total_deductions
@@ -448,9 +485,9 @@ paths:
       - bearerAuth: []
       responses:
         '201':
-          description: payroll run created
+          description: same period allowed for another currency
         '422':
-          description: duplicate payroll period
+          description: duplicate payroll period and currency
       requestBody:
         content:
           application/json:
@@ -463,8 +500,12 @@ paths:
                     payroll_period:
                       type: string
                       example: 2026-09
+                    currency:
+                      type: string
+                      example: USD
                   required:
                   - payroll_period
+                  - currency
         required: true
   "/api/v1/payroll_runs/{id}":
     parameters:
@@ -518,6 +559,9 @@ paths:
                     payroll_period:
                       type: string
                       example: 2026-10
+                    currency:
+                      type: string
+                      example: USD
         required: true
     delete:
       summary: Delete payroll run
@@ -592,6 +636,8 @@ paths:
                         format: uuid
                       payroll_period:
                         type: string
+                      currency:
+                        type: string
                       status:
                         type: string
                       total_gross:
@@ -603,6 +649,7 @@ paths:
                     required:
                     - id
                     - payroll_period
+                    - currency
                     - status
                     - total_gross
                     - total_deductions

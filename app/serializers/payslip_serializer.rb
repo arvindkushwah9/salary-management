@@ -7,7 +7,19 @@ class PayslipSerializer
     {
       id: @payslip.id,
       payroll_run_id: @payslip.payroll_run_id,
+      payroll_run: {
+        id: @payslip.payroll_run.id,
+        payroll_period: @payslip.payroll_run.payroll_period,
+        currency: @payslip.payroll_run.currency
+      },
+      currency: @payslip.payroll_run.currency,
       employee_id: @payslip.employee_id,
+      employee: {
+        id: @payslip.employee.id,
+        employee_code: @payslip.employee.employee_code,
+        full_name: @payslip.employee.full_name,
+        email: @payslip.employee.email
+      },
       working_days: @payslip.working_days,
       paid_days: @payslip.paid_days.to_f,
       gross_earnings: @payslip.gross_earnings.to_f,

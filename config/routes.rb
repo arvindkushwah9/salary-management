@@ -27,14 +27,19 @@ Rails.application.routes.draw do
         member do
           post :process, action: :process_payroll
           post :approve
+          get :export
         end
 
         resources :payslips, only: %i[index show]
       end
 
       resources :payslips, only: :show do
-        resources :payslip_items, only: %i[index create]
+        member do
+          get :export
+        end
+        resources :payslip_items, only: %i[index create destroy]
       end
+      resources :departments, only: :index
     end
   end
 end

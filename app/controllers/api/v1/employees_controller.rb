@@ -1,13 +1,18 @@
 module Api
   module V1
     class EmployeesController < ApplicationController
-      def index
+       def index
         employees = Employee
           .search(params[:search])
           .by_country(params[:country])
-          .by_department(params[:department])
+          .by_department(params[:department_id])
           .by_status(params[:status])
-          .order(:last_name, :first_name)
+
+        if params[:has_salary].to_s == "true"
+          employees = employees.with_salary
+        end
+
+        employees = employees.order(:last_name, :first_name)
 
         pagy, records = pagy(employees)
 
@@ -64,6 +69,7 @@ module Api
           :email,
           :department_id,
           :designation,
+          :job_title,
           :country,
           :status,
           :joined_date

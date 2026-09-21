@@ -7,6 +7,7 @@ class PayrollRunSerializer
     {
       id: @payroll_run.id,
       payroll_period: @payroll_run.payroll_period,
+      currency: @payroll_run.currency,
       status: @payroll_run.status,
       total_gross: @payroll_run.total_gross.to_f,
       total_deductions: @payroll_run.total_deductions.to_f,

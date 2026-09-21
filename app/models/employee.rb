@@ -49,7 +49,18 @@ class Employee < ApplicationRecord
   }
 
   scope :by_status, ->(status) {
-    where(status: status) if status.present?
+      case status
+      when "inactive"
+        inactive
+      when *STATUSES
+        where(status: status)
+      else
+        all
+      end
+    }
+
+  scope :with_salary, -> {
+    joins(:salary_structures).distinct
   }
 
   scope :search, ->(term) {

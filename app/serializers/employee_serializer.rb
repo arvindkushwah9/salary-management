@@ -12,9 +12,21 @@ class EmployeeSerializer
       full_name: @employee.full_name,
       email: @employee.email,
       country: @employee.country,
-      department: @employee.department,
+      department: department_json,
       job_title: @employee.job_title,
-      status: @employee.status
+      status: @employee.status,
+      joined_date: @employee.joined_date
+    }
+  end
+
+  def department_json
+    department = @employee.department
+    return nil unless department
+
+    {
+      id: department.id,
+      code: department.code,
+      name: department.name
     }
   end
 end
