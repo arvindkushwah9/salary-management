@@ -246,26 +246,13 @@ Verify Rails:
 rails -v
 ```
 
-Create the API application:
-
-```bash
-rails new salary_management_backend \
-  --api \
-  --database=postgresql
-```
-
-Move into the project:
-
-```bash
-cd salary_management_backend
-```
 
 > For normal setup, clone the completed repository instead. The repository already contains the application code, migrations, models, controllers, services, serializers, specs, factories, and seed implementation.
 
 ### Clone the Repository
 
 ```bash
-git clone <BACKEND_REPOSITORY_URL>
+git clone https://github.com/arvindkushwah9/salary-management-backend
 cd salary-management-backend
 ```
 
