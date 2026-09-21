@@ -233,7 +233,7 @@ git --version
 ## Clone the Repository
 
 ```bash
-git clone <FRONTEND_REPOSITORY_URL>
+git clone https://github.com/arvindkushwah9/salary-management-frontend
 cd salary-management-frontend
 ```
 
