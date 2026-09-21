@@ -1,6 +1,0 @@
-[submodule "backend"]
-	path = backend
-	url = https://github.com/arvindkushwah9/salary-management-backend
-[submodule "frontend"]
-	path = frontend
-	url = https://github.com/arvindkushwah9/salary-management-frontend
