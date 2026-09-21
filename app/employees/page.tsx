@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -21,18 +21,31 @@ import {
   Employee,
   EmployeeListResponse,
   DepartmentListResponse,
+  EmployeeStatusFilter,
 } from "@/lib/types";
 import { formatDate } from "@/lib/formatters";
 const PAGE_SIZE = 20;
 
-export default function EmployeesPage() {
+function isEmployeeStatusFilter(
+  value: string
+): value is EmployeeStatusFilter {
+  return (
+    value === "" ||
+    value === "active" ||
+    value === "inactive" ||
+    value === "on_leave" ||
+    value === "terminated"
+  );
+}
+
+function EmployeesPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [search, setSearch] = useState("");
-  const [status, setStatus] = useState("");
+const [status, setStatus] = useState<EmployeeStatusFilter>("");
   const [country, setCountry] = useState("");
   const [departmentId, setDepartmentId] = useState("");
   const [hasSalary, setHasSalary] = useState(false);
@@ -75,7 +88,7 @@ export default function EmployeesPage() {
     const urlStatus = searchParams.get("status") || "";
     const urlHasSalary = searchParams.get("has_salary") === "true";
 
-    setStatus(urlStatus);
+    setStatus(isEmployeeStatusFilter(urlStatus) ? urlStatus : "");
     setHasSalary(urlHasSalary);
     setPage(1);
   }, [searchParams]);
@@ -150,11 +163,18 @@ export default function EmployeesPage() {
     }
   }
 
-  function handleFilterChange(
-    setter: (value: string) => void,
-    value: string
-  ) {
-    setter(value);
+  function handleFilterChange<T>(
+      setter: (value: T) => void,
+      value: T
+    ) {
+      setter(value);
+      setPage(1);
+    }
+
+  function handleStatusChange(value: string) {
+    if (!isEmployeeStatusFilter(value)) return;
+
+    setStatus(value);
     setPage(1);
   }
 
@@ -208,13 +228,12 @@ export default function EmployeesPage() {
 
             <select
               value={status}
-              onChange={(event) =>
-                handleFilterChange(setStatus, event.target.value)
-              }
+              onChange={(event) => handleStatusChange(event.target.value)}
               className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-blue-400"
             >
               <option value="">All statuses</option>
               <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
               <option value="on_leave">On leave</option>
               <option value="terminated">Terminated</option>
             </select>
@@ -426,5 +445,21 @@ export default function EmployeesPage() {
         </div>
       </div>
     </AppShell>
+  );
+}
+
+export default function EmployeesPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-[300px] items-center justify-center">
+          <p className="text-sm text-slate-500">
+            Loading employees...
+          </p>
+        </div>
+      }
+    >
+      <EmployeesPageContent />
+    </Suspense>
   );
 }

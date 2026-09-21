@@ -26,6 +26,18 @@ export type Department = {
   name: string;
 };
 
+export type EmployeeStatus =
+  | "active"
+  | "terminated"
+  | "on_leave";
+
+export type EmployeeStatusFilter =
+  | ""
+  | "active"
+  | "inactive"
+  | "terminated"
+  | "on_leave";
+
 export type Employee = {
   id: string;
   employee_code: string;
@@ -35,8 +47,9 @@ export type Employee = {
   email: string;
   country: string;
   department: Department | null;
+  designation: string;
   job_title: string;
-  status: "active" | "terminated" | "on_leave" | string;
+  status: EmployeeStatus;
   joined_date: string;
 };
 

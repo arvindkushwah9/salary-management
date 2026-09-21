@@ -26,7 +26,7 @@ import {
 } from "@/lib/types";
 import LoadingState from "@/components/ui/LoadingState";
 import ErrorState from "@/components/ui/ErrorState";
-
+import EmptyState from "@/components/ui/EmptyState";
 export default function EmployeeDetailsPage() {
   const params = useParams();
   const router = useRouter();
