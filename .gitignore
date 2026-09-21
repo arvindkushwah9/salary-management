@@ -1,0 +1,26 @@
+.DS_Store
+
+# macOS
+.AppleDouble
+.LSOverride
+
+# Node
+node_modules/
+.next/
+out/
+coverage/
+
+# Rails
+backend/log/*
+backend/tmp/*
+backend/storage/*
+backend/.env
+backend/.env.*
+
+# Frontend environment
+frontend/.env
+frontend/.env.*
+
+# IDE
+.idea/
+.vscode/
